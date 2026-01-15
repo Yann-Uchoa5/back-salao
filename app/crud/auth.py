@@ -1,25 +1,40 @@
 from sqlalchemy.orm import Session
 from typing import Optional
-from passlib.context import CryptContext
+import bcrypt
 from models.usuario import Usuario
 from schemas.login import UsuarioCreate
-
-# Configuração para hash de senhas
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """
     Verifica se a senha fornecida corresponde ao hash armazenado.
     """
-    return pwd_context.verify(plain_password, hashed_password)
+    try:
+        # Converte a senha para bytes se necessário
+        if isinstance(plain_password, str):
+            plain_password = plain_password.encode('utf-8')
+        if isinstance(hashed_password, str):
+            hashed_password = hashed_password.encode('utf-8')
+        
+        return bcrypt.checkpw(plain_password, hashed_password)
+    except Exception:
+        return False
 
 
 def get_password_hash(password: str) -> str:
     """
-    Gera o hash da senha.
+    Gera o hash da senha usando bcrypt.
     """
-    return pwd_context.hash(password)
+    # Converte a senha para bytes
+    if isinstance(password, str):
+        password = password.encode('utf-8')
+    
+    # Gera o salt e faz o hash
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(password, salt)
+    
+    # Retorna como string
+    return hashed.decode('utf-8')
 
 
 def get_usuario_by_username(db: Session, username: str) -> Optional[Usuario]:

@@ -25,9 +25,37 @@ def criar_cliente_route(
 ):
     """
     Cria um novo cliente no sistema.
+    
+    Campos obrigatórios:
+    - nome: string (mínimo 1 caractere)
+    - data_procedimento: date (formato YYYY-MM-DD, ex: "2024-01-15")
+    - tipo_procedimento: string (mínimo 1 caractere)
+    - valor_procedimento: float (deve ser >= 0)
+    
+    Campos opcionais:
+    - qtd_tonalizante: float (deve ser >= 0)
+    - observacao: string (máximo 1000 caracteres)
+    - corte: boolean (padrão: false)
+    
+    Exemplo de JSON:
+    {
+        "nome": "Maria Silva",
+        "data_procedimento": "2024-01-15",
+        "tipo_procedimento": "Coloração",
+        "valor_procedimento": 150.00,
+        "qtd_tonalizante": 50.5,
+        "observacao": "Cliente satisfeita",
+        "corte": true
+    }
     """
-    db_cliente = criar_cliente(db=db, cliente=cliente_data)
-    return db_cliente
+    try:
+        db_cliente = criar_cliente(db=db, cliente=cliente_data)
+        return db_cliente
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Erro ao criar cliente: {str(e)}"
+        )
 
 
 @router.get("/", response_model=List[ClienteOut])

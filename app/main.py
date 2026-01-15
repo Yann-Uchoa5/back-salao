@@ -1,11 +1,53 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from v1 import cliente, login
+from db.base import Base
+from db.session import engine
+from models.usuario import Usuario
+from models.cliente import Cliente
 
 app = FastAPI(
     title="Sistema de Salão - API",
     description="API para gerenciamento de clientes e procedimentos do salão",
     version="1.0.0"
 )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """
+    Handler personalizado para erros de validação, retorna mensagens mais claras.
+    """
+    errors = []
+    for error in exc.errors():
+        # Extrai o caminho do campo
+        field_path = error["loc"]
+        # Remove "body" do início se existir
+        field = ".".join(str(loc) for loc in field_path if loc != "body")
+        
+        errors.append({
+            "campo": field if field else "body",
+            "mensagem": error["msg"],
+            "tipo": error["type"],
+            "valor_recebido": error.get("input")
+        })
+    
+    return JSONResponse(
+        status_code=422,
+        content={
+            "detail": "Erro de validação nos dados enviados",
+            "erros": errors
+        }
+    )
+
+# Criar tabelas automaticamente ao iniciar (apenas se não existirem)
+@app.on_event("startup")
+def on_startup():
+    """
+    Cria as tabelas no banco de dados quando a aplicação inicia.
+    """
+    Base.metadata.create_all(bind=engine)
 
 # Registrar os routers
 app.include_router(login.router, prefix="/api/v1/auth", tags=["Autenticação"])
