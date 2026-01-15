@@ -100,6 +100,24 @@ def get_me(
 ):
     """
     Retorna as informações do usuário autenticado.
+    Use este endpoint para testar se sua autenticação está funcionando.
     """
     return current_user
+
+
+@router.get("/test-auth")
+def test_auth(
+    current_user: Usuario = Depends(get_current_user)
+):
+    """
+    Endpoint de teste para verificar se a autenticação está funcionando.
+    Retorna informações sobre o usuário autenticado.
+    """
+    return {
+        "status": "Autenticação funcionando!",
+        "usuario_id": current_user.id,
+        "username": current_user.username,
+        "is_admin": current_user.is_admin,
+        "is_active": current_user.is_active
+    }
 

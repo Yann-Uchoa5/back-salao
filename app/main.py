@@ -1,11 +1,12 @@
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from v1 import cliente, login
+from v1 import cliente, login, procedimento
 from db.base import Base
 from db.session import engine
 from models.usuario import Usuario
 from models.cliente import Cliente
+from models.procedimento import Procedimento
 
 app = FastAPI(
     title="Sistema de Salão - API",
@@ -52,6 +53,7 @@ def on_startup():
 # Registrar os routers
 app.include_router(login.router, prefix="/api/v1/auth", tags=["Autenticação"])
 app.include_router(cliente.router, prefix="/api/v1/clientes", tags=["Clientes"])
+app.include_router(procedimento.router, prefix="/api/v1/procedimentos", tags=["Procedimentos"])
 
 
 @app.get("/")

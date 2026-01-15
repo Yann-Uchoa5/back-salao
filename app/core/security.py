@@ -33,6 +33,12 @@ def decode_access_token(token: str) -> Optional[Dict]:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload
+    except jwt.ExpiredSignatureError:
+        # Token expirado
+        return None
+    except jwt.InvalidTokenError:
+        # Token inválido (formato incorreto, assinatura inválida, etc)
+        return None
     except JWTError:
         return None
 
