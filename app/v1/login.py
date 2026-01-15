@@ -18,22 +18,26 @@ def login(
     db: Session = Depends(get_db)
 ):
     """
-    Endpoint de login. Aceita username e password.
+    Endpoint de login. Aceita email (no campo username) e password.
     Retorna um token JWT e informações do usuário.
+    
+    Nota: OAuth2PasswordRequestForm usa "username" como nome do campo,
+    mas aqui aceitamos email nesse campo.
     """
+    # OAuth2PasswordRequestForm usa "username" como nome do campo, mas aceitamos email
     usuario = autenticar_usuario(db, form_data.username, form_data.password)
     
     if not usuario:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Username ou senha incorretos",
+            detail="Email ou senha incorretos",
             headers={"WWW-Authenticate": "Bearer"},
         )
     
     # Cria o token de acesso
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": usuario.username, "id": usuario.id, "role": "admin" if usuario.is_admin else "user"},
+        data={"sub": usuario.email, "id": usuario.id, "role": "admin" if usuario.is_admin else "user"},
         expires_delta=access_token_expires
     )
     
@@ -50,22 +54,22 @@ def login_json(
     db: Session = Depends(get_db)
 ):
     """
-    Endpoint de login alternativo que aceita JSON ao invés de form-data.
+    Endpoint de login que aceita JSON com email e senha.
     Retorna um token JWT e informações do usuário.
     """
-    usuario = autenticar_usuario(db, login_data.username, login_data.password)
+    usuario = autenticar_usuario(db, login_data.email, login_data.password)
     
     if not usuario:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Username ou senha incorretos",
+            detail="Email ou senha incorretos",
             headers={"WWW-Authenticate": "Bearer"},
         )
     
     # Cria o token de acesso
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": usuario.username, "id": usuario.id, "role": "admin" if usuario.is_admin else "user"},
+        data={"sub": usuario.email, "id": usuario.id, "role": "admin" if usuario.is_admin else "user"},
         expires_delta=access_token_expires
     )
     

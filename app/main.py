@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from v1 import cliente, login, procedimento
 from db.base import Base
 from db.session import engine
@@ -12,6 +13,21 @@ app = FastAPI(
     title="Sistema de Salão - API",
     description="API para gerenciamento de clientes e procedimentos do salão",
     version="1.0.0"
+)
+
+# Configurar CORS para permitir requisições do frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",  # React padrão
+        "http://localhost:5173",  # Vite padrão
+        "http://localhost:5174",  # Vite alternativo
+        "http://localhost:8080",  # Vue padrão
+        "http://localhost:4200",  # Angular padrão
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 

@@ -58,12 +58,12 @@ def get_usuario_by_id(db: Session, usuario_id: int) -> Optional[Usuario]:
     return db.query(Usuario).filter(Usuario.id == usuario_id).first()
 
 
-def autenticar_usuario(db: Session, username: str, password: str) -> Optional[Usuario]:
+def autenticar_usuario(db: Session, email: str, password: str) -> Optional[Usuario]:
     """
-    Autentica um usuário verificando username e senha.
+    Autentica um usuário verificando email e senha.
     Retorna o usuário se as credenciais estiverem corretas, None caso contrário.
     """
-    usuario = get_usuario_by_username(db, username)
+    usuario = get_usuario_by_email(db, email)
     if not usuario:
         return None
     

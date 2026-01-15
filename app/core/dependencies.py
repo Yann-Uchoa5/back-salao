@@ -8,7 +8,7 @@ from core.security import decode_access_token
 from crud.auth import get_usuario_by_id
 from models.usuario import Usuario
 
-bearer_scheme = HTTPBearer(auto_error=False)
+bearer_scheme = HTTPBearer()
 
 
 def get_db():
@@ -20,9 +20,6 @@ def get_db():
         yield db
     finally:
         db.close()
-
-
-bearer_scheme = HTTPBearer()
 
 
 def get_current_user(

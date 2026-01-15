@@ -4,7 +4,7 @@ from datetime import datetime
 
 
 class LoginRequest(BaseModel):
-    username: str = Field(..., min_length=1, description="Nome de usuário")
+    email: EmailStr = Field(..., description="Email do usuário")
     password: str = Field(..., min_length=1, description="Senha")
 
 
